@@ -1,6 +1,4 @@
 
-
-
 #include "../include/lexer.h"
 
 int read_identifier(const char** restrict fptr, node* tail ) {
@@ -11,7 +9,6 @@ int read_identifier(const char** restrict fptr, node* tail ) {
 	for ( ; ISALPHA(**fptr) || ISDIGIT(**fptr) || **fptr == PERCNT  ; length++ ) {
 		*fptr += 1; 
 	}
-
 
 	curr_token->value.identifier.length = length;
 	curr_token->value.identifier.start = (*fptr)-length;
@@ -38,17 +35,18 @@ int read_number(const char** restrict fptr, node* tail) {
 	return 0;
 };
 
-inline void update_tokens(node** tail) {
-	node* new_token = malloc(sizeof(*new_token));
-	*new_token = (node){.token = {0}, .next = NULL};
-	(*tail)->next = new_token;
-	*tail = new_token;
-}
 
-void lexer( const char* fptr ) {
+// to-do: terminar read_punctuation
+//int read_punctuation( const char** fptr, node* tail, TokenType token_type ) {
+
+
+//}
+
+
+// to-do: testar o lexer apos a implementacao do switch
+// 				e a troca de posicao do update_tail
+void lexer( const char* fptr, node* tokens) {
 	
-	node* tokens = malloc(sizeof(*tokens));
-	*tokens = (node){.token = {0}, .next = NULL};
 	node* tail = tokens;
 	while(*fptr) {
  
@@ -57,58 +55,42 @@ void lexer( const char* fptr ) {
 			continue;
 		}
 
-		if ( *fptr == COLON ) {
-			//read_punctuation(&fptr, tail, TOKEN_COLON);
-			update_tokens(&tail);	
-		}
-
-		if ( *fptr == OPEN_BRACKT ) {
-			//read_punctuation(&fptr, tail, TOKEN_OPEN_BRACKT);
-			update_tokens(&tail);
-		}
-
-		if ( *fptr == CLOSED_BRACKT ) {
-			//read_punctuation(&fptr, tail, TOKEN_CLOSED_BRACKT);
-			update_tokens(&tail);
-		}
-
-
-		if ( *fptr == COMMA ) {
-			//read_punctuation(&fptr, tail, TOKEN_COMMA);
-			update_tokens(&tail);
-		}
-
-		if ( *fptr == QUOTE ) {
-			//read_string(*fptr, tail);
-			update_tokens(&tail);
-		}
-
-		if ( *fptr == SEMICOLON )
+		if ( *fptr == SEMICOLON ) {
 			for ( ; *fptr != NEWLINE && *fptr != '\0'; fptr++);
-		
-		if ( ISALPHA(*fptr) || *fptr == UNDERSCORE || *fptr == DOT || *fptr == PERCNT ) {
+			continue;
+		}
+
+		update_tail(&tail);
+
+		switch(*fptr) {
+			case COLON:
+				//read_punctuation(&fptr, tail, TOKEN_COLON);
+				break;
+			case OPEN_BRACKT:
+				//read_punctuation(&fptr, tail, TOKEN_OPEN_BRACKT);
+				break;
+			case CLOSED_BRACKT:
+				//read_punctuation(&fptr, tail, TOKEN_CLOSED_BRACKT);
+				break;
+			case COMMA:
+				//read_punctuation(&fptr, tail, TOKEN_COLON);
+				break;
+			case QUOTE:
+				//read_punctuation(&fptr, tail, TOKEN_COLON);
+				break;
+		} 
+
+		if ( ISALPHA(*fptr) || *fptr == UNDERSCORE || *fptr == DOT || *fptr == PERCNT ) 
 			read_identifier(&fptr, tail);
-			update_tokens(&tail);
-		}
-		if (ISDIGIT(*fptr)) {
+		
+		if (ISDIGIT(*fptr)) 
 			read_number(&fptr, tail);
-			update_tokens(&tail);
-		}
-	
 	};
+
 }
 
 
 
-int main(void) {
-				
-	char* f = malloc(128);
-	fread(f,1, 128, stdin);
-	printf("%s\n", f);
-	lexer(f);
-
-	return 0;
-}
 
 
 
